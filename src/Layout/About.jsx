@@ -1,7 +1,6 @@
 import React from "react";
 import { PersonStanding } from "lucide-react";
 import Navbar from "../Layout/Navbar";
-import Stats from "../Layout/rate";
 import Value from "../Layout/values";
 import Footer from "../Layout/Footer";
 
