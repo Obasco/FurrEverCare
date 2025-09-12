@@ -1,0 +1,228 @@
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import paw from "../assets/paw.jpg";
+
+const Signup = () => {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [category, setCategory] = useState("");
+  const [profile, setProfile] = useState(null);
+  const [success, setSuccess] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!category) {
+      setSuccess("⚠️ Please select a category.");
+      return;
+    }
+
+    const user = { fullName, email, phone, password, category, profile };
+    localStorage.setItem("fureverUser", JSON.stringify(user));
+
+    setSuccess("Signup Successful! 🎉 You can now log in.");
+    setFullName("");
+    setEmail("");
+    setPhone("");
+    setPassword("");
+    setCategory("");
+    setProfile(null);
+
+    setTimeout(() => {
+      navigate("/login");
+    }, 1200);
+  };
+
+  const handleProfileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setProfile(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  return (
+    <section className="relative flex items-center justify-center min-h-screen bg-gray-900">
+      <div className="shadow-2xl rounded-2xl p-8 w-full max-w-md relative z-10 bg-gray-800 border border-gray-700">
+        {/* Logo */}
+        <div className="flex justify-center mb-4">
+          <img
+            src={paw}
+            alt="Paw Logo"
+            width={80}
+            height={80}
+            className="rounded-full shadow-lg border-2 border-green-400"
+          />
+        </div>
+
+        <h1 className="text-3xl font-extrabold text-center text-green-400 mb-1">
+          Create Account
+        </h1>
+        <h3 className="font-medium text-center text-gray-300 mb-6">
+          Start your pet care journey with us 🐶🐱
+        </h3>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Full Name */}
+          <div>
+            <label htmlFor="fullName" className="block text-gray-300 font-medium">
+              Full Name:
+            </label>
+            <input
+              id="fullName"
+              type="text"
+              value={fullName}
+              required
+              onChange={(e) => setFullName(e.target.value)}
+              className="w-full mt-1 px-4 py-2 bg-gray-900 border border-gray-600 rounded-xl text-white focus:ring-2 focus:ring-green-400 focus:outline-none"
+              placeholder="Enter your full name"
+            />
+          </div>
+
+          {/* Email */}
+          <div>
+            <label htmlFor="email" className="block text-gray-300 font-medium">
+              Email:
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              required
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full mt-1 px-4 py-2 bg-gray-900 border border-gray-600 rounded-xl text-white focus:ring-2 focus:ring-green-400 focus:outline-none"
+              placeholder="Enter your email"
+            />
+          </div>
+
+          {/* Phone */}
+          <div>
+            <label htmlFor="phone" className="block text-gray-300 font-medium">
+              Phone Number:
+            </label>
+            <input
+              id="phone"
+              type="tel"
+              value={phone}
+              required
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full mt-1 px-4 py-2 bg-gray-900 border border-gray-600 rounded-xl text-white focus:ring-2 focus:ring-green-400 focus:outline-none"
+              placeholder="Enter your phone number"
+            />
+          </div>
+
+          {/* Password */}
+          <div>
+            <label htmlFor="password" className="block text-gray-300 font-medium">
+              Password:
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              required
+              minLength={6}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full mt-1 px-4 py-2 bg-gray-900 border border-gray-600 rounded-xl text-white focus:ring-2 focus:ring-green-400 focus:outline-none"
+              placeholder="Create a password"
+            />
+          </div>
+
+          {/* Profile Upload */}
+          <div>
+            <label className="block text-gray-300 font-medium">Profile Picture:</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleProfileChange}
+              className="w-full mt-1 text-sm text-gray-400"
+            />
+            {profile && (
+              <div className="mt-3 flex justify-center">
+                <img
+                  src={profile}
+                  alt="Profile Preview"
+                  className="w-20 h-20 rounded-full border-2 border-green-400 shadow-md object-cover"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Category */}
+          <div>
+            <p className="block text-gray-300 font-medium mb-2">Category:</p>
+            <div className="flex flex-col gap-3">
+              {["Vet", "Animal Shelter", "Pet Owner"].map((option) => (
+                <label
+                  key={option}
+                  className={`flex items-center gap-3 px-4 py-2 border rounded-xl cursor-pointer transition ${
+                    category === option
+                      ? "border-green-400 bg-gray-700"
+                      : "border-gray-600 hover:border-green-300"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="category"
+                    value={option}
+                    checked={category === option}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="hidden"
+                  />
+                  <span
+                    className={`w-4 h-4 flex items-center justify-center rounded-full border-2 transition ${
+                      category === option
+                        ? "border-green-400 bg-green-400"
+                        : "border-gray-500"
+                    }`}
+                  >
+                    {category === option && (
+                      <span className="w-2 h-2 bg-gray-900 rounded-full"></span>
+                    )}
+                  </span>
+                  <span className="text-gray-300 font-medium">{option}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Success Message */}
+          {success && (
+            <p
+              className={`text-center text-sm font-medium ${
+                success.includes("⚠️") ? "text-red-400" : "text-green-400"
+              }`}
+            >
+              {success}
+            </p>
+          )}
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full bg-green-400 text-gray-900 font-semibold py-2 px-4 rounded-xl shadow-md hover:bg-green-500 transition duration-300"
+          >
+            Sign Up
+          </button>
+
+          <p className="text-center text-gray-400 mt-4">
+            Already have an account?{" "}
+            <span
+              onClick={() => navigate("/login")}
+              className="text-green-400 font-semibold hover:underline cursor-pointer"
+            >
+              Log In
+            </span>
+          </p>
+        </form>
+      </div>
+    </section>
+  );
+};
+
+export default Signup;
