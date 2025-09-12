@@ -1,12 +1,13 @@
 import React from "react";
 import TextType from "./TextType";
 import { useNavigate } from "react-router-dom";
+import  "../Style/Texttype.css";
 
 const TextTyp = () => {
     const navigate = useNavigate();
 
     return (
-        <section className="bg-gray-900 min-h-screen flex flex-col items-center justify-center px-6">
+        <section className="bg-gray-900 backdrop-blur-lg  min-h-screen flex flex-col items-center justify-center px-6 bg-img">
             <TextType
                 text={[
                     "Welcome to FurEver Care ",

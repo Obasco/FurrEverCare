@@ -12,3 +12,11 @@
 .text-type__cursor--hidden {
   display: none;
 }
+
+.bg-img{
+  background:url("/src/assets/joe.jpg");
+  background-size: cover;
+ 
+  width: 100%;
+  height:100%;
+}

@@ -5,6 +5,7 @@ import paw from "../assets/paw.jpg";
 const Signup = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState(""); // ✅ new state
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [category, setCategory] = useState("");
@@ -12,11 +13,26 @@ const Signup = () => {
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
+  // Email validation regex
+  const validateEmail = (value) => {
+    const regex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
+    if (!regex.test(value)) {
+      setEmailError("⚠️ Please enter a valid email address (e.g. name@example.com)");
+    } else {
+      setEmailError("");
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!category) {
       setSuccess("⚠️ Please select a category.");
+      return;
+    }
+
+    if (emailError) {
+      setSuccess("⚠️ Fix the email error before submitting.");
       return;
     }
 
@@ -94,10 +110,18 @@ const Signup = () => {
               type="email"
               value={email}
               required
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full mt-1 px-4 py-2 bg-gray-900 border border-gray-600 rounded-xl text-white focus:ring-2 focus:ring-green-400 focus:outline-none"
+              onChange={(e) => {
+                setEmail(e.target.value);
+                validateEmail(e.target.value);
+              }}
+              className={`w-full mt-1 px-4 py-2 bg-gray-900 border rounded-xl text-white focus:ring-2 focus:outline-none ${
+                emailError ? "border-red-500 focus:ring-red-400" : "border-gray-600 focus:ring-green-400"
+              }`}
               placeholder="Enter your email"
             />
+            {emailError && (
+              <p className="text-red-400 text-sm mt-1">{emailError}</p>
+            )}
           </div>
 
           {/* Phone */}
@@ -116,8 +140,8 @@ const Signup = () => {
             />
           </div>
 
-          {/* Password */}
-          <div>
+          {/* Password with requirements */}
+          <div className="flex flex-col">
             <label htmlFor="password" className="block text-gray-300 font-medium">
               Password:
             </label>
@@ -131,6 +155,19 @@ const Signup = () => {
               className="w-full mt-1 px-4 py-2 bg-gray-900 border border-gray-600 rounded-xl text-white focus:ring-2 focus:ring-green-400 focus:outline-none"
               placeholder="Create a password"
             />
+
+            {/* Password requirements */}
+            <ul className="mt-2 space-y-1 text-xs sm:text-sm text-gray-400">
+              <li className={password.length >= 6 ? "text-green-400" : "text-red-400"}>
+                • At least 6 characters
+              </li>
+              <li className={/[A-Z]/.test(password) ? "text-green-400" : "text-red-400"}>
+                • One uppercase letter
+              </li>
+              <li className={/[0-9]/.test(password) ? "text-green-400" : "text-red-400"}>
+                • One number
+              </li>
+            </ul>
           </div>
 
           {/* Profile Upload */}
@@ -146,6 +183,7 @@ const Signup = () => {
               <div className="mt-3 flex justify-center">
                 <img
                   src={profile}
+                  required
                   alt="Profile Preview"
                   className="w-20 h-20 rounded-full border-2 border-green-400 shadow-md object-cover"
                 />
