@@ -5,34 +5,47 @@ import paw from "../assets/paw.jpg";
 const Signup = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState(""); // ✅ new state
+  const [emailError, setEmailError] = useState("");
   const [phone, setPhone] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const [password, setPassword] = useState("");
   const [category, setCategory] = useState("");
   const [profile, setProfile] = useState(null);
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
-  // Email validation regex
   const validateEmail = (value) => {
     const regex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
-    if (!regex.test(value)) {
-      setEmailError("⚠️ Please enter a valid email address (e.g. name@example.com)");
-    } else {
-      setEmailError("");
-    }
+    setEmailError(
+      regex.test(value)
+        ? ""
+        : "⚠️ Please enter a valid email address (e.g. name@example.com)"
+    );
   };
+
+  const validatePhone = (value) => {
+    const regex = /^[0-9]{10,11}$/;
+    setPhoneError(regex.test(value) ? "" : "⚠️ Phone number must be 10–11 digits");
+  };
+
+  const passwordValid =
+    password.length >= 6 && /[A-Z]/.test(password) && /[0-9]/.test(password);
+
+  const isFormValid =
+    fullName &&
+    email &&
+    !emailError &&
+    phone &&
+    !phoneError &&
+    passwordValid &&
+    category &&
+    profile;
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!category) {
-      setSuccess("⚠️ Please select a category.");
-      return;
-    }
-
-    if (emailError) {
-      setSuccess("⚠️ Fix the email error before submitting.");
+    if (!isFormValid) {
+      setSuccess("⚠️ Please complete all requirements before submitting.");
       return;
     }
 
@@ -47,9 +60,7 @@ const Signup = () => {
     setCategory("");
     setProfile(null);
 
-    setTimeout(() => {
-      navigate("/login");
-    }, 1200);
+    setTimeout(() => navigate("/login"), 1200);
   };
 
   const handleProfileChange = (e) => {
@@ -64,8 +75,8 @@ const Signup = () => {
   return (
     <section className="relative flex items-center justify-center min-h-screen bg-gray-900">
       <div className="shadow-2xl rounded-2xl p-8 w-full max-w-md relative z-10 bg-gray-800 border border-gray-700">
-        {/* Logo */}
-        <div className="flex justify-center mb-4">
+        {/* Logo + Profile */}
+        <div className="flex justify-center items-center gap-4 mb-4">
           <img
             src={paw}
             alt="Paw Logo"
@@ -73,6 +84,13 @@ const Signup = () => {
             height={80}
             className="rounded-full shadow-lg border-2 border-green-400"
           />
+          {profile && (
+            <img
+              src={profile}
+              alt="Profile Preview"
+              className="w-20 h-20 rounded-full border-2 border-green-400 shadow-md object-cover"
+            />
+          )}
         </div>
 
         <h1 className="text-3xl font-extrabold text-center text-green-400 mb-1">
@@ -115,7 +133,9 @@ const Signup = () => {
                 validateEmail(e.target.value);
               }}
               className={`w-full mt-1 px-4 py-2 bg-gray-900 border rounded-xl text-white focus:ring-2 focus:outline-none ${
-                emailError ? "border-red-500 focus:ring-red-400" : "border-gray-600 focus:ring-green-400"
+                emailError
+                  ? "border-red-500 focus:ring-red-400"
+                  : "border-gray-600 focus:ring-green-400"
               }`}
               placeholder="Enter your email"
             />
@@ -134,10 +154,20 @@ const Signup = () => {
               type="tel"
               value={phone}
               required
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full mt-1 px-4 py-2 bg-gray-900 border border-gray-600 rounded-xl text-white focus:ring-2 focus:ring-green-400 focus:outline-none"
+              onChange={(e) => {
+                setPhone(e.target.value);
+                validatePhone(e.target.value);
+              }}
+              className={`w-full mt-1 px-4 py-2 bg-gray-900 border rounded-xl text-white focus:ring-2 focus:outline-none ${
+                phoneError
+                  ? "border-red-500 focus:ring-red-400"
+                  : "border-gray-600 focus:ring-green-400"
+              }`}
               placeholder="Enter your phone number"
             />
+            {phoneError && (
+              <p className="text-red-400 text-sm mt-1">{phoneError}</p>
+            )}
           </div>
 
           {/* Password with requirements */}
@@ -156,42 +186,48 @@ const Signup = () => {
               placeholder="Create a password"
             />
 
-            {/* Password requirements */}
             <ul className="mt-2 space-y-1 text-xs sm:text-sm text-gray-400">
-              <li className={password.length >= 6 ? "text-green-400" : "text-red-400"}>
+              <li
+                className={
+                  password.length >= 6 ? "text-green-400" : "text-red-400"
+                }
+              >
                 • At least 6 characters
               </li>
-              <li className={/[A-Z]/.test(password) ? "text-green-400" : "text-red-400"}>
+              <li
+                className={/[A-Z]/.test(password) ? "text-green-400" : "text-red-400"}
+              >
                 • One uppercase letter
               </li>
-              <li className={/[0-9]/.test(password) ? "text-green-400" : "text-red-400"}>
+              <li
+                className={/[0-9]/.test(password) ? "text-green-400" : "text-red-400"}
+              >
                 • One number
               </li>
             </ul>
           </div>
 
-          {/* Profile Upload */}
+       
           <div>
-            <label className="block text-gray-300 font-medium">Profile Picture:</label>
+            <label className="block text-gray-300 font-medium">
+              Profile Picture:
+            </label>
             <input
               type="file"
               accept="image/*"
+              id="profileUpload"
               onChange={handleProfileChange}
-              className="w-full mt-1 text-sm text-gray-400"
+              className="hidden"
             />
-            {profile && (
-              <div className="mt-3 flex justify-center">
-                <img
-                  src={profile}
-                  required
-                  alt="Profile Preview"
-                  className="w-20 h-20 rounded-full border-2 border-green-400 shadow-md object-cover"
-                />
-              </div>
-            )}
+            <button
+              type="button"
+              onClick={() => document.getElementById("profileUpload").click()}
+              className="mt-2 px-6 py-2 bg-green-400 text-gray-900 font-semibold rounded-lg hover:bg-green-500 transition"
+            >
+              {profile ? "Change Profile Picture" : "Upload Profile Picture"}
+            </button>
           </div>
 
-          {/* Category */}
           <div>
             <p className="block text-gray-300 font-medium mb-2">Category:</p>
             <div className="flex flex-col gap-3">
@@ -229,7 +265,7 @@ const Signup = () => {
             </div>
           </div>
 
-          {/* Success Message */}
+        
           {success && (
             <p
               className={`text-center text-sm font-medium ${
@@ -240,10 +276,15 @@ const Signup = () => {
             </p>
           )}
 
-          {/* Submit Button */}
+         
           <button
             type="submit"
-            className="w-full bg-green-400 text-gray-900 font-semibold py-2 px-4 rounded-xl shadow-md hover:bg-green-500 transition duration-300"
+            disabled={!isFormValid}
+            className={`w-full font-semibold py-2 px-4 rounded-xl shadow-md transition duration-300 ${
+              isFormValid
+                ? "bg-green-400 text-gray-900 hover:bg-green-500"
+                : "bg-gray-600 text-gray-400 cursor-not-allowed"
+            }`}
           >
             Sign Up
           </button>

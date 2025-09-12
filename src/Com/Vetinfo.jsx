@@ -1,163 +1,171 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Upload, ArrowRight } from "lucide-react";
+import { Upload, ArrowRight,ArrowLeftCircleIcon } from "lucide-react";
+
 
 const VeterinarianForm = () => {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
+ const navigate = useNavigate();
+  const [data, setData] = useState({
     name: "",
     specialization: "",
     phone: "",
     email: "",
     address: "",
     image: null,
-    imagePreview: ""
+    preview: ""
   });
 
-  const handleInputChange = (e) => {
+  // just a quick input handler
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setData(prev => ({
       ...prev,
       [name]: value
     }));
   };
 
-  const handleImageUpload = (e) => {
+  // img upload (simple FileReader)
+  const handleImage = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData(prev => ({
-          ...prev,
-          image: file,
-          imagePreview: reader.result
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setData(prev => ({
+        ...prev,
+        image: file,
+        preview: reader.result
+      }));
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Store the data (in a real app, you would send this to a backend)
-    localStorage.setItem('veterinarianData', JSON.stringify(formData));
-    navigate('/vet');
+    localStorage.setItem("vetInfo", JSON.stringify(data));
+    navigate("/vet");
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white py-12 px-4">
-      <div className="max-w-2xl mx-auto bg-gray-800 rounded-xl shadow-2xl p-8">
-        <h1 className="text-3xl font-bold text-green-400 mb-2 text-center">
-          Veterinarian Information
+    <div className="min-h-screen bg-gray-900 text-white py-10 px-4">
+      {/* back button */}
+      <div className="mb-4">
+        <button
+          onClick={() => navigate("/home")}
+          className="flex items-center text-green-400 hover:text-green-300 gap-1"
+        >
+          <ArrowLeftCircleIcon size={20} />
+          <span>Back</span>
+        </button>
+      </div>
+
+      <div className="max-w-xl mx-auto bg-gray-800 rounded-lg shadow-xl p-6">
+        <h1 className="text-2xl font-bold text-green-400 mb-2 text-center">
+          Vet Info Form
         </h1>
-        <p className="text-gray-400 text-center mb-8">
-          Please provide your professional details
+        <p className="text-gray-400 text-sm text-center mb-6">
+          Fill in your details below
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Image Upload */}
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* upload */}
           <div className="flex flex-col items-center">
-            <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-green-400 border-dashed mb-4">
-              {formData.imagePreview ? (
-                <img 
-                  src={formData.imagePreview} 
-                  alt="Preview" 
+            <div className="relative w-28 h-28 rounded-full overflow-hidden border-2 border-dashed border-green-500 mb-3">
+              {data.preview ? (
+                <img
+                  src={data.preview}
+                  alt="preview"
                   className="w-full h-full object-cover"
                 />
               ) : (
                 <div className="w-full h-full bg-gray-700 flex items-center justify-center">
-                  <Upload className="text-gray-400" size={32} />
+                  <Upload size={28} className="text-gray-400" />
                 </div>
               )}
             </div>
-            <label className="cursor-pointer bg-green-400 text-gray-900 px-4 py-2 rounded-lg font-semibold hover:bg-green-500 transition">
-              Upload Photo
+            <label className="cursor-pointer bg-green-400 text-black px-3 py-1.5 rounded-md text-sm font-medium hover:bg-green-500">
+              Upload
               <input
                 type="file"
                 accept="image/*"
-                onChange={handleImageUpload}
+                onChange={handleImage}
                 className="hidden"
               />
             </label>
           </div>
 
-          {/* Name */}
+          {/* name */}
           <div>
-            <label className="block text-gray-300 mb-2">Full Name</label>
+            <label className="block text-gray-300 mb-1 text-sm">Full Name</label>
             <input
               type="text"
               name="name"
-              value={formData.name}
-              onChange={handleInputChange}
+              value={data.name}
+              onChange={handleChange}
               required
-              className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
-              placeholder="Dr. Sarah Johnson"
+              className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
+              placeholder="Dr. Michael Adams"
             />
           </div>
 
-          {/* Specialization */}
+          {/* specialization */}
           <div>
-            <label className="block text-gray-300 mb-2">Specialization</label>
+            <label className="block text-gray-300 mb-1 text-sm">Specialization</label>
             <input
               type="text"
               name="specialization"
-              value={formData.specialization}
-              onChange={handleInputChange}
+              value={data.specialization}
+              onChange={handleChange}
               required
-              className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
-              placeholder="Veterinary Surgery & Internal Medicine"
+              className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
+              placeholder="Small animals / Surgery"
             />
           </div>
 
-          {/* Contact Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* phone + email */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="block text-gray-300 mb-2">Phone Number</label>
+              <label className="block text-gray-300 mb-1 text-sm">Phone</label>
               <input
                 type="tel"
                 name="phone"
-                value={formData.phone}
-                onChange={handleInputChange}
-                required
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                placeholder="+1 (555) 123-4567"
+                value={data.phone}
+                onChange={handleChange}
+                className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                placeholder="0813-456-7890"
               />
             </div>
             <div>
-              <label className="block text-gray-300 mb-2">Email Address</label>
+              <label className="block text-gray-300 mb-1 text-sm">Email</label>
               <input
                 type="email"
                 name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
-                placeholder="dr.sarah@furevercare.com"
+                value={data.email}
+                onChange={handleChange}
+                className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                placeholder="mike.vet@lagoonclinic.com"
               />
             </div>
           </div>
 
-          {/* Address */}
+          {/* address */}
           <div>
-            <label className="block text-gray-300 mb-2">Clinic Address</label>
+            <label className="block text-gray-300 mb-1 text-sm">Clinic Address</label>
             <textarea
               name="address"
-              value={formData.address}
-              onChange={handleInputChange}
-              required
+              value={data.address}
+              onChange={handleChange}
               rows={3}
-              className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
-              placeholder="123 Pet Care Blvd, Anytown, ST 12345"
+              className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
+              placeholder="Lagoon Vet Clinic, Victoria Island, Lagos"
             />
           </div>
 
-          {/* Submit Button */}
+          {/* submit */}
           <button
             type="submit"
-            className="w-full bg-green-400 text-gray-900 py-3 rounded-lg font-semibold hover:bg-green-500 transition flex items-center justify-center gap-2"
+            className="w-full bg-green-400 text-gray-900 py-2.5 rounded-md font-semibold hover:bg-green-500 flex items-center justify-center gap-2"
           >
-            Continue to Profile
-            <ArrowRight size={20} />
+            Continue <ArrowRight size={18} />
           </button>
         </form>
       </div>
