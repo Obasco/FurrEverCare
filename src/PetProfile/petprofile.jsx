@@ -4,7 +4,7 @@ import pawImage from "../assets/paw.jpg";
 
 const PetProfile = () => {
   const [pet, setPet] = useState({
-    name: "OLumide",
+    name: "Paw Patrol",
     breed: "Golden Retriever",
     age: "3 years",
     weight: "28 kg",
