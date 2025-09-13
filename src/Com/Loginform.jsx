@@ -23,7 +23,13 @@ const Login = () => {
       setFullName("");
       setPassword("");
       setError("");
-    } else {
+    }else if (storedUser.fullName.toLowerCase() !== "admin" && storedUser.password !== "Admin123") {
+      navigate("/text");
+      setFullName("");
+      setPassword("");
+      setError("");
+    }
+    else {
       setError("Invalid name or password. Please try again.");
     }
   };
